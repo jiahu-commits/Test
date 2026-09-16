@@ -6,5 +6,5 @@ class Semester:
     nummer: int
     module: list[Modul] = field(default_factory=list)
 
-    def modul_hinzufuegen(self, modul: Modul) -> None:
-        self.module.append(modul)
+    def modul_hinzufuegen(self, neues_modul: Modul) -> None:
+        self.module.append(neues_modul)

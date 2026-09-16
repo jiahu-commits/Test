@@ -11,5 +11,5 @@ class Studiengang:
     zielnote: float
     semester: list[Semester] = field(default_factory=list)
 
-    def semester_hinzufuegen(self, semester: Semester) -> None:
-        self.semester.append(semester)
+    def semester_hinzufuegen(self, neues_semester: Semester) -> None:
+        self.semester.append(neues_semester)
