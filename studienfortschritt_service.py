@@ -1,4 +1,5 @@
 from studiengang import Studiengang
+from datetime import date
 
 class StudienfortschrittService:
     def berechne_erreichte_ects(self, aktueller_studiengang: Studiengang) -> int:
@@ -24,5 +25,23 @@ class StudienfortschrittService:
             return None
 
         return sum(noten) / len(noten)
+
+    def berechne_ects_fortschritt(self, aktueller_studiengang: Studiengang) -> float:
+        erreichte_ects = self.berechne_erreichte_ects(aktueller_studiengang)
+
+        if aktueller_studiengang.gesamt_ects == 0:
+            return 0.0
+
+        return erreichte_ects / aktueller_studiengang.gesamt_ects * 100
+
+    def berechne_vergangene_monate(self, aktueller_studiengang: Studiengang) -> int:
+        heutiges_datum = date.today()
+        vergangene_monate = (heutiges_datum.year - aktueller_studiengang.startdatum.year) * 12
+        vergangene_monate += heutiges_datum.month - aktueller_studiengang.startdatum.month
+
+        if heutiges_datum.day < aktueller_studiengang.startdatum.day:
+            vergangene_monate -= 1
+
+        return vergangene_monate
 
 
