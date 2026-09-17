@@ -16,8 +16,10 @@ service = StudienfortschrittService()
 
 print(service.berechne_erreichte_ects(studiengang))
 print(service.berechne_notendurchschnitt(studiengang))
+print(service.berechne_zeitfortschritt(studiengang))
+print(service.berechne_ects_fortschritt(studiengang))
+print(service.berechne_vergangene_monate(studiengang))
 
 print(studiengang.semester[0].module[0].pruefungsleistung.note)
 print(studiengang.semester[0].module[0].name)
-print(service.berechne_ects_fortschritt(studiengang))
-print(service.berechne_vergangene_monate(studiengang))
+

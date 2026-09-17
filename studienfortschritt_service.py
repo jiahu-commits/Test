@@ -44,4 +44,11 @@ class StudienfortschrittService:
 
         return vergangene_monate
 
+    def berechne_zeitfortschritt(self, aktueller_studiengang: Studiengang) -> float:
+        vergangene_monate = self.berechne_vergangene_monate(aktueller_studiengang)
+
+        if aktueller_studiengang.studiendauer_monate == 0:
+            return 0.0
+
+        return vergangene_monate / aktueller_studiengang.studiendauer_monate * 100
 
