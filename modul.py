@@ -6,4 +6,4 @@ class Modul:
     name: str
     ects: int
     status: str
-    pruefungsleistung: Pruefungsleistung
+    pruefungsleistung: Pruefungsleistung| None = None
