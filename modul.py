@@ -7,3 +7,6 @@ class Modul:
     ects: int
     status: str
     pruefungsleistung: Pruefungsleistung| None = None
+
+    def status_aendern(self, neuer_status: str) -> None:
+        self.status = neuer_status

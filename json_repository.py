@@ -1,5 +1,5 @@
 import json
-from enum import nonmember
+from datetime import date
 
 from studiengang import Studiengang
 from semester import Semester
@@ -50,9 +50,47 @@ class JsonRepository:
         datei.close()
 
 
-def laden(self, dateipfad: str) -> Studiengang:
-    datei = open(dateipfad, "r", encoding="utf-8")
-    daten = json.load(datei)
-    datei.close()
-    geladener_studiengang = Studiengang(
+    def laden(self, dateipfad: str) -> Studiengang:
+        datei = open(dateipfad, "r", encoding="utf-8")
+        daten = json.load(datei)
+        datei.close()
+        geladener_studiengang = Studiengang(
+            daten["name"],
+            date.fromisoformat(daten["startdatum"]),
+            daten["gesamt_ects"],
+            daten["studiendauer_monate"],
+            daten["zielnote"]
+        )
+
+        for gespeicherte_semesterdaten in daten["semester"]:
+            geladenes_semester = Semester(
+                gespeicherte_semesterdaten["nummer"]
+            )
+
+            for gespeicherte_moduldaten in gespeicherte_semesterdaten["module"]:
+                gespeicherte_pruefungsdaten = gespeicherte_moduldaten["pruefungsleistung"]
+
+                if gespeicherte_pruefungsdaten is not None:
+                    geladene_pruefungsleistung = Pruefungsleistung(
+                        gespeicherte_pruefungsdaten["pruefungsart"],
+                        gespeicherte_pruefungsdaten["note"]
+                    )
+
+                else:
+                 geladene_pruefungsleistung = None
+
+                geladenes_modul = Modul(
+                    gespeicherte_moduldaten["name"],
+                    gespeicherte_moduldaten["ects"],
+                    gespeicherte_moduldaten["status"],
+                    geladene_pruefungsleistung
+                )
+
+                geladenes_semester.modul_hinzufuegen(geladenes_modul)
+                geladener_studiengang.semester_hinzufuegen(geladenes_semester)
+
+        return geladener_studiengang
+
+
+
 
