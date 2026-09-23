@@ -3,11 +3,26 @@ from pruefungsart import Pruefungsart
 
 @dataclass
 class Pruefungsleistung:
-    pruefungsart: Pruefungsart
+    _pruefungsart: Pruefungsart
     _note: float | None = None
 
     def __post_init__(self) -> None:
+        self.pruefungsart = self._pruefungsart
         self.note = self._note
+
+
+    @property
+    def pruefungsart(self) -> Pruefungsart:
+        return self._pruefungsart
+
+    @pruefungsart.setter
+    def pruefungsart(self, neue_pruefungsart: Pruefungsart) -> None:
+        if not isinstance(neue_pruefungsart, Pruefungsart):
+            raise ValueError ("Ungültige Prüfungsart")
+
+        self._pruefungsart = neue_pruefungsart
+
+
 
     @property
     def note(self) -> float | None:

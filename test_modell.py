@@ -23,5 +23,5 @@ print(service.berechne_ects_fortschritt(studiengang))
 print(service.berechne_vergangene_monate(studiengang))
 
 print(studiengang.semester[0].module[0].pruefungsleistung.note)
-print(studiengang.semester[0].module[0].name)
+print(studiengang.semester[0].module[0].pruefungsleistung.pruefungsart.value)
 
