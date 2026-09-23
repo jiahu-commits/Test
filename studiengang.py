@@ -13,3 +13,6 @@ class Studiengang:
 
     def semester_hinzufuegen(self, neues_semester: Semester) -> None:
         self.semester.append(neues_semester)
+
+    def semester_entfernen(self, zu_entfernendes_semester: Semester) -> None:
+        self.semester.remove(zu_entfernendes_semester)

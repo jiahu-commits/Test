@@ -2,6 +2,7 @@ from studiengang import Studiengang
 from datetime import date
 
 class StudienfortschrittService:
+
     def berechne_erreichte_ects(self, aktueller_studiengang: Studiengang) -> int:
         erreichte_ects = 0
 
