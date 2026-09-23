@@ -5,13 +5,15 @@ from semester import Semester
 from modul import Modul
 from pruefungsleistung import Pruefungsleistung
 from json_repository import JsonRepository
+from modul_status import ModulStatus
+from pruefungsart import Pruefungsart
 
 
-pruefung = Pruefungsleistung("Klausur", 1.3)
+pruefung = Pruefungsleistung(Pruefungsart.KLAUSUR, 1.3)
 
 
-modul = Modul("E-Health", 5, "Bestanden", pruefung)
-modul_ohne_pruefung = Modul("Programmieren mit Python", 5, "In Bearbeitung")
+modul = Modul("E-Health", 5, ModulStatus.BESTANDEN, pruefung)
+modul_ohne_pruefung = Modul("Programmieren mit Python", 5, ModulStatus.BESTANDEN, pruefung)
 
 
 semester = Semester(1)
@@ -34,10 +36,10 @@ geladener_studiengang = repository.laden("studiendaten.json")
 print(geladener_studiengang.name)
 print(geladener_studiengang.semester[0].nummer)
 print(geladener_studiengang.semester[0].module[0].name)
-print(geladener_studiengang.semester[0].module[0].pruefungsleistung.pruefungsart)
+print(geladener_studiengang.semester[0].module[0].pruefungsleistung.pruefungsart.value)
 print(geladener_studiengang.semester[0].module[0].pruefungsleistung.note)
 
 print(geladener_studiengang.semester[0].module[1].name)
-print(geladener_studiengang.semester[0].module[1].pruefungsleistung)
+print(geladener_studiengang.semester[0].module[1].pruefungsleistung.pruefungsart.value)
 
 

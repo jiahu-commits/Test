@@ -5,6 +5,8 @@ from studiengang import Studiengang
 from semester import Semester
 from modul import Modul
 from pruefungsleistung import Pruefungsleistung
+from modul_status import ModulStatus
+from pruefungsart import Pruefungsart
 
 class JsonRepository:
     def speichern(self, aktueller_studiengang: Studiengang, dateipfad: str) -> None:
@@ -27,7 +29,7 @@ class JsonRepository:
                 modul_daten = {
                     "name": aktuelles_modul.name,
                     "ects": aktuelles_modul.ects,
-                    "status": aktuelles_modul.status,
+                    "status": aktuelles_modul.status.value,
 
                 }
 
@@ -35,7 +37,7 @@ class JsonRepository:
 
                 if aktuelle_pruefungsleistung is not None:
                     modul_daten["pruefungsleistung"] = {
-                        "pruefungsart": aktuelle_pruefungsleistung.pruefungsart,
+                        "pruefungsart": aktuelle_pruefungsleistung.pruefungsart.value,
                         "note": aktuelle_pruefungsleistung.note
                     }
 
@@ -72,7 +74,7 @@ class JsonRepository:
 
                 if gespeicherte_pruefungsdaten is not None:
                     geladene_pruefungsleistung = Pruefungsleistung(
-                        gespeicherte_pruefungsdaten["pruefungsart"],
+                        Pruefungsart(gespeicherte_pruefungsdaten["pruefungsart"]),
                         gespeicherte_pruefungsdaten["note"]
                     )
 
@@ -82,7 +84,7 @@ class JsonRepository:
                 geladenes_modul = Modul(
                     gespeicherte_moduldaten["name"],
                     gespeicherte_moduldaten["ects"],
-                    gespeicherte_moduldaten["status"],
+                    ModulStatus(gespeicherte_moduldaten["status"]),
                     geladene_pruefungsleistung
                 )
 

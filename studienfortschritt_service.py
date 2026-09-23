@@ -1,5 +1,7 @@
 from studiengang import Studiengang
 from datetime import date
+from modul_status import ModulStatus
+
 
 class StudienfortschrittService:
 
@@ -8,7 +10,7 @@ class StudienfortschrittService:
 
         for aktuelles_semester in aktueller_studiengang.semester:
             for aktuelles_modul in aktuelles_semester.module:
-                if aktuelles_modul.status == "Bestanden":
+                if aktuelles_modul.status == ModulStatus.BESTANDEN:
                     erreichte_ects += aktuelles_modul.ects
 
         return erreichte_ects
