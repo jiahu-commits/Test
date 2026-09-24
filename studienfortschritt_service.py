@@ -55,3 +55,35 @@ class StudienfortschrittService:
 
         return vergangene_monate / aktueller_studiengang.studiendauer_monate * 100
 
+    def berechne_soll_ects(self, aktueller_studiengang: Studiengang) -> float:
+        vergangene_monate = self.berechne_vergangene_monate(aktueller_studiengang)
+
+        if aktueller_studiengang.studiendauer_monate == 0:
+            return 0.0
+
+        soll_ects = (
+            vergangene_monate / aktueller_studiengang.studiendauer_monate
+            * aktueller_studiengang.gesamt_ects
+        )
+
+        return soll_ects
+
+    def berechne_soll_ist_abweichung(self, aktueller_studiengang: Studiengang) -> float:
+        ist_ects = self.berechne_erreichte_ects(aktueller_studiengang)
+        soll_ects = self.berechne_soll_ects(aktueller_studiengang)
+
+        return ist_ects - soll_ects
+
+    def berechne_notenabweichung(self, aktueller_studiengang: Studiengang) -> float | None:
+        notendurchschnitt = self.berechne_notendurchschnitt(aktueller_studiengang)
+
+        if notendurchschnitt is None:
+            return None
+
+        return aktueller_studiengang.zielnote - notendurchschnitt
+
+
+
+
+
+
