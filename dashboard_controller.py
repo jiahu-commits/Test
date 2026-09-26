@@ -1,6 +1,7 @@
 from studiengang import Studiengang
 from semester import Semester
 from modul import Modul
+from modul_status import ModulStatus
 from pruefungsleistung import Pruefungsleistung
 from studienfortschritt_service import StudienfortschrittService
 from json_repository import JsonRepository
@@ -40,9 +41,11 @@ class DashboardController:
             semester_nummer: int,
             name: str,
             ects: int,
-            status: str,
+            status: ModulStatus,
             pruefungsleistung: Pruefungsleistung | None = None
     ) -> None:
+
+        gefundenes_semester = None
         for aktuelles_semester in self.aktueller_studiengang.semester:
             if aktuelles_semester.nummer == semester_nummer:
                 gefundenes_semester = aktuelles_semester
@@ -88,11 +91,21 @@ class DashboardController:
 
         return None
 
-    def status_aendern(self, semester_nummer: int, modul_name: str, neuer_status: str) -> None:
+    def status_aendern(self, semester_nummer: int, modul_name: str, neuer_status: ModulStatus) -> None:
         gefundenes_modul = self._finde_modul(semester_nummer, modul_name)
 
         if gefundenes_modul is None:
             return
 
-        gefundenes_modul.status_aendern(neuer_status)
+        gefundenes_modul.status = neuer_status
+        self.repository.speichern(self.aktueller_studiengang, self.dateipfad)
+
+    def note_eintragen(self, semester_nummer: int, modul_name: str, neue_note: float) -> None:
+        gefundenes_modul = self._finde_modul(semester_nummer, modul_name)
+        if gefundenes_modul is None:
+            return
+        if gefundenes_modul.pruefungsleistung is None:
+            return
+
+        gefundenes_modul.pruefungsleistung.note = neue_note
         self.repository.speichern(self.aktueller_studiengang, self.dateipfad)

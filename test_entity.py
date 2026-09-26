@@ -11,3 +11,5 @@ print(pruefung.note)
 
 print(modul.status.value)
 print(modul.pruefungsleistung.pruefungsart.value)
+
+
