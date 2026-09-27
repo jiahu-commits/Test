@@ -109,3 +109,37 @@ class DashboardController:
 
         gefundenes_modul.pruefungsleistung.note = neue_note
         self.repository.speichern(self.aktueller_studiengang, self.dateipfad)
+
+    def semester_abrufen(self) -> list[Semester]:
+        return self.aktueller_studiengang.semester
+
+    def module_abrufen(self, semester_nummer: int) -> list[Modul]:
+        for aktuelles_semester in self.aktueller_studiengang.semester:
+            if aktuelles_semester.nummer == semester_nummer:
+                return aktuelles_semester.module
+
+        return []
+
+    def kennzahlen_abrufen(self) -> dict:
+        erreichte_ects = self.service.berechne_erreichte_ects(self.aktueller_studiengang)
+        ects_fortschritt = self.service.berechne_ects_fortschritt(self.aktueller_studiengang)
+        notendurchschnitt = self.service.berechne_notendurchschnitt(self.aktueller_studiengang)
+        vergangene_monate = self.service.berechne_vergangene_monate(self.aktueller_studiengang)
+        zeitfortschritt = self.service.berechne_zeitfortschritt(self.aktueller_studiengang)
+        soll_ects = self.service.berechne_soll_ects(self.aktueller_studiengang)
+        ects_soll_ist_abweichung = self.service.berechne_soll_ist_abweichung(self.aktueller_studiengang)
+        notenabweichung = self.service.berechne_notenabweichung(self.aktueller_studiengang)
+
+        return {
+            "erreichte_ects": erreichte_ects,
+            "ects_fortschritt": ects_fortschritt,
+            "notendurchschnitt": notendurchschnitt,
+            "vergangene_monate": vergangene_monate,
+            "zeitfortschritt": zeitfortschritt,
+            "soll_ects": soll_ects,
+            "ects_soll_ist_abweichung": ects_soll_ist_abweichung,
+            "notenabweichung": notenabweichung,
+            "gesamt_ects": self.aktueller_studiengang.gesamt_ects,
+            "studiendauer_monate": self.aktueller_studiengang.studiendauer_monate,
+            "zielnote": self.aktueller_studiengang.zielnote
+        }
