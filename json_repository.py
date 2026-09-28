@@ -89,7 +89,8 @@ class JsonRepository:
                 )
 
                 geladenes_semester.modul_hinzufuegen(geladenes_modul)
-                geladener_studiengang.semester_hinzufuegen(geladenes_semester)
+
+            geladener_studiengang.semester_hinzufuegen(geladenes_semester)
 
         return geladener_studiengang
 
