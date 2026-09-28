@@ -13,18 +13,32 @@ class DashboardController:
         self.service = StudienfortschrittService()
         self.repository = JsonRepository()
 
+    def _finde_semester(self, semester_nummer: int) -> Semester | None:
+        for aktuelles_semester in self.aktueller_studiengang.semester:
+            if aktuelles_semester.nummer == semester_nummer:
+                return aktuelles_semester
+
+        return None
+
+    def _finde_modul(self, semester_nummer: int, modul_name: str) -> Modul | None:
+        gefundenes_semester = self._finde_semester(semester_nummer)
+
+        if gefundenes_semester is None:
+            return None
+
+        for aktuelles_modul in gefundenes_semester.module:
+            if aktuelles_modul.name == modul_name:
+                return aktuelles_modul
+
+        return None
+
     def semester_hinzufuegen(self, nummer: int) -> None:
         neues_semester = Semester(nummer)
         self.aktueller_studiengang.semester_hinzufuegen(neues_semester)
         self.repository.speichern(self.aktueller_studiengang, self.dateipfad)
 
     def semester_entfernen(self, semester_nummer: int) -> None:
-        gefundenes_semester = None
-
-        for aktuelles_semester in self.aktueller_studiengang.semester:
-            if aktuelles_semester.nummer == semester_nummer:
-                gefundenes_semester = aktuelles_semester
-                break
+        gefundenes_semester = self._finde_semester(semester_nummer)
 
         if gefundenes_semester is None:
             return
@@ -45,11 +59,7 @@ class DashboardController:
             pruefungsleistung: Pruefungsleistung | None = None
     ) -> None:
 
-        gefundenes_semester = None
-        for aktuelles_semester in self.aktueller_studiengang.semester:
-            if aktuelles_semester.nummer == semester_nummer:
-                gefundenes_semester = aktuelles_semester
-                break
+        gefundenes_semester = self._finde_semester(semester_nummer)
 
         if gefundenes_semester is None:
             return
@@ -59,37 +69,18 @@ class DashboardController:
         self.repository.speichern(self.aktueller_studiengang, self.dateipfad)
 
     def modul_loeschen(self, semester_nummer: int, modul_name: str) -> None:
-        gefundenes_semester = None
-
-        for aktuelles_semester in self.aktueller_studiengang.semester:
-            if aktuelles_semester.nummer == semester_nummer:
-                gefundenes_semester = aktuelles_semester
-                break
+        gefundenes_semester = self._finde_semester(semester_nummer)
 
         if gefundenes_semester is None:
             return
 
-        gefundenes_modul = None
-
-        for aktuelles_modul in gefundenes_semester.module:
-            if aktuelles_modul.name == modul_name:
-                gefundenes_modul = aktuelles_modul
-                break
+        gefundenes_modul = self._finde_modul(semester_nummer, modul_name)
 
         if gefundenes_modul is None:
             return
 
         gefundenes_semester.modul_entfernen(gefundenes_modul)
         self.repository.speichern(self.aktueller_studiengang, self.dateipfad)
-
-    def _finde_modul(self, semester_nummer: int, modul_name: str) -> Modul | None:
-        for aktuelles_semester in self.aktueller_studiengang.semester:
-            if aktuelles_semester.nummer == semester_nummer:
-                for aktuelles_modul in aktuelles_semester.module:
-                    if aktuelles_modul.name == modul_name:
-                        return aktuelles_modul
-
-        return None
 
     def status_aendern(self, semester_nummer: int, modul_name: str, neuer_status: ModulStatus) -> None:
         gefundenes_modul = self._finde_modul(semester_nummer, modul_name)
@@ -114,11 +105,12 @@ class DashboardController:
         return self.aktueller_studiengang.semester
 
     def module_abrufen(self, semester_nummer: int) -> list[Modul]:
-        for aktuelles_semester in self.aktueller_studiengang.semester:
-            if aktuelles_semester.nummer == semester_nummer:
-                return aktuelles_semester.module
+        gefundenes_semester = self._finde_semester(semester_nummer)
 
-        return []
+        if gefundenes_semester is None:
+            return []
+
+        return gefundenes_semester.module
 
     def kennzahlen_abrufen(self) -> dict:
         erreichte_ects = self.service.berechne_erreichte_ects(self.aktueller_studiengang)
