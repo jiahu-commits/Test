@@ -5,6 +5,8 @@ from pruefungsleistung import Pruefungsleistung
 from pruefungsart import Pruefungsart
 from modul_status import ModulStatus
 from dashboard_controller import DashboardController
+from studienfortschritt_service import StudienfortschrittService
+from json_repository import JsonRepository
 
 studiengang = Studiengang(
     "Medizinische Informatik",
@@ -14,7 +16,10 @@ studiengang = Studiengang(
     2.0
 )
 
-controller = DashboardController(studiengang)
+service = StudienfortschrittService()
+repository = JsonRepository()
+
+controller = DashboardController(studiengang,service,repository)
 
 controller.semester_hinzufuegen(1)
 print(controller.semester_abrufen())

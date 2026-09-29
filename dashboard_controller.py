@@ -7,11 +7,17 @@ from studienfortschritt_service import StudienfortschrittService
 from json_repository import JsonRepository
 
 class DashboardController:
-    def __init__(self, aktueller_studiengang: Studiengang, dateipfad: str = "studiendaten.json") -> None:
+    def __init__(
+            self,
+            aktueller_studiengang: Studiengang,
+            service: StudienfortschrittService,
+            repository: JsonRepository,
+            dateipfad: str = "studiendaten.json"
+    ) -> None:
         self.aktueller_studiengang = aktueller_studiengang
+        self.service = service
+        self.repository = repository
         self.dateipfad = dateipfad
-        self.service = StudienfortschrittService()
-        self.repository = JsonRepository()
 
     def _finde_semester(self, semester_nummer: int) -> Semester | None:
         for aktuelles_semester in self.aktueller_studiengang.semester:
