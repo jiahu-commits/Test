@@ -6,6 +6,7 @@ from pruefungsleistung import Pruefungsleistung
 from pruefungsart import Pruefungsart
 from modul_status import ModulStatus
 from studienfortschritt_service import StudienfortschrittService
+from dashboard_application import DashboardApplication
 
 pruefung = Pruefungsleistung(Pruefungsart.KLAUSUR, 1.3)
 modul = Modul("E-Health", 5, ModulStatus.BESTANDEN, pruefung)
@@ -24,4 +25,3 @@ print(service.berechne_vergangene_monate(studiengang))
 
 print(studiengang.semester[0].module[0].pruefungsleistung.note)
 print(studiengang.semester[0].module[0].pruefungsleistung.pruefungsart.value)
-
