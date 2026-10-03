@@ -5,7 +5,7 @@ from dashboard_controller import DashboardController
 
 class DashboardView:
 
-    def __init__(self, controller: DashboardController):
+    def __init__(self, controller: DashboardController) -> None:
         self.controller = controller
 
         self.fenster = tk.Tk()
@@ -15,6 +15,7 @@ class DashboardView:
         self.kopfbereich_erstellen()
         self.inhaltsbereich_erstellen()
         self.studienfortschritt_erstellen()
+        self.notenbereich_erstellen()
 
 
     def kopfbereich_erstellen(self) -> None:
@@ -145,9 +146,88 @@ class DashboardView:
             pady=(0, 15)
         )
 
+    def notenbereich_erstellen(self) -> None:
+        kennzahlen = self.controller.kennzahlen_abrufen()
+
+        notendurchschnitt = kennzahlen["notendurchschnitt"]
+        zielnote = kennzahlen["zielnote"]
+        notenabweichung = kennzahlen["notenabweichung"]
+
+        if notendurchschnitt is None:
+            aktuell_text = "Aktuell: –"
+        else:
+            aktuell_text = f"Aktuell: {notendurchschnitt:.1f}"
+
+        ziel_text = f"Ziel: {zielnote:.1f} oder besser"
+
+        if notendurchschnitt is None or notenabweichung is None:
+            abweichung_text = "Noch kein Notenvergleich möglich"
+        elif notendurchschnitt < zielnote:
+            abweichung_text = (
+                f"{abs(notenabweichung):.1f} Notenpunkte besser als Ziel"
+            )
+        elif notendurchschnitt > zielnote:
+            abweichung_text = (
+                f"{abs(notenabweichung):.1f} Notenpunkte schlechter als Ziel"
+            )
+        else:
+            abweichung_text = "Zielnote genau erreicht"
+
+        self.noten_bereich = tk.Frame(
+            self.kennzahlen_zeile,
+            bd=1,
+            relief="solid",
+            height=100
+        )
+        self.noten_bereich.grid(
+            row=0,
+            column=1,
+            sticky="nsew",
+            padx=(10, 0)
+        )
+
+        self.noten_titel = tk.Label(
+            self.noten_bereich,
+            text="Notendurchschnitt",
+            font=("Arial", 12, "bold")
+        )
+        self.noten_titel.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 5)
+        )
+
+        self.noten_text = tk.Label(
+            self.noten_bereich,
+            text=aktuell_text,
+            font=("Arial", 16, "bold")
+        )
+        self.noten_text.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 10)
+        )
+
+        self.noten_ziel = tk.Label(
+            self.noten_bereich,
+            text=ziel_text
+        )
+        self.noten_ziel.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 8)
+        )
+
+        self.noten_abweichung = tk.Label(
+            self.noten_bereich,
+            text=abweichung_text
+        )
+        self.noten_abweichung.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 15)
+        )
+
     def starten(self) -> None:
         self.fenster.mainloop()
-        
-
-
 
