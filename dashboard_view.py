@@ -147,6 +147,7 @@ class DashboardView:
 
     def starten(self) -> None:
         self.fenster.mainloop()
+        
 
 
 
