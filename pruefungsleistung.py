@@ -23,7 +23,6 @@ class Pruefungsleistung:
         self._pruefungsart = neue_pruefungsart
 
 
-
     @property
     def note(self) -> float | None:
         return self._note

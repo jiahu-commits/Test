@@ -16,6 +16,7 @@ class DashboardView:
         self.inhaltsbereich_erstellen()
         self.studienfortschritt_erstellen()
         self.notenbereich_erstellen()
+        self.zeitbereich_erstellen()
 
 
     def kopfbereich_erstellen(self) -> None:
@@ -223,6 +224,112 @@ class DashboardView:
             text=abweichung_text
         )
         self.noten_abweichung.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 15)
+        )
+
+
+    def zeitbereich_erstellen(self) -> None:
+        kennzahlen = self.controller.kennzahlen_abrufen()
+
+        self.zeit_bereich = tk.Frame(
+            self.inhalt,
+            bd=1,
+            relief="solid",
+            height=100
+        )
+        self.zeit_bereich.pack(
+            fill="x",
+            pady=(20, 0)
+        )
+
+        self.zeit_bereich.columnconfigure(
+            0,
+            weight=1,
+            uniform="zeit"
+        )
+        self.zeit_bereich.columnconfigure(
+            1,
+            weight=1,
+            uniform="zeit"
+        )
+
+        self.zeit_links = tk.Frame(
+            self.zeit_bereich
+        )
+        self.zeit_links.grid(
+            row=0,
+            column=0,
+            sticky="nsew"
+        )
+
+        self.zeit_titel = tk.Label(
+            self.zeit_links,
+            text="Zeitlicher Stand",
+            font=("Arial", 12, "bold")
+        )
+        self.zeit_titel.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 10)
+        )
+
+        self.zeit_text = tk.Label(
+            self.zeit_links,
+            text=(
+                f'{kennzahlen["vergangene_monate"]} von '
+                f'{kennzahlen["studiendauer_monate"]} '
+                f'Studienmonaten vergangen'
+            ),
+            font=("Arial", 14)
+        )
+        self.zeit_text.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 5)
+        )
+
+        self.zeit_prozent = tk.Label(
+            self.zeit_links,
+            text=(
+                f'{kennzahlen["zeitfortschritt"]:.1f} % '
+                f'der geplanten Studienzeit'
+            )
+        )
+        self.zeit_prozent.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 15)
+        )
+
+        self.zeit_rechts = tk.Frame(
+            self.zeit_bereich
+        )
+        self.zeit_rechts.grid(
+            row=0,
+            column=1,
+            sticky="nsew"
+        )
+
+        self.zeit_soll = tk.Label(
+            self.zeit_rechts,
+            text=f'Soll-Stand: {kennzahlen["soll_ects"]:.2f} ECTS'
+        )
+        self.zeit_soll.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 10)
+        )
+
+        self.zeit_abweichung = tk.Label(
+            self.zeit_rechts,
+            text=(
+                f'Abweichung '
+                f'{kennzahlen["ects_soll_ist_abweichung"]:+.2f} ECTS'
+            )
+        )
+        self.zeit_abweichung.pack(
             anchor="w",
             padx=20,
             pady=(0, 15)
