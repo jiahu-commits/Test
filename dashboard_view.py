@@ -17,6 +17,7 @@ class DashboardView:
         self.studienfortschritt_erstellen()
         self.notenbereich_erstellen()
         self.zeitbereich_erstellen()
+        self.modulbereich_erstellen()
 
 
     def kopfbereich_erstellen(self) -> None:
@@ -334,6 +335,256 @@ class DashboardView:
             padx=20,
             pady=(0, 15)
         )
+
+    def modulbereich_erstellen(self) -> None:
+        self.modul_bereich = tk.Frame(
+            self.inhalt,
+            bd=1,
+            relief="solid"
+        )
+        self.modul_bereich.pack(
+            fill="both",
+            expand=True,
+            pady=(20, 0)
+        )
+
+        self.modul_kopfzeile = tk.Frame(
+            self.modul_bereich
+        )
+        self.modul_kopfzeile.pack(
+            fill="x",
+            padx=20,
+            pady=15
+        )
+
+        self.modul_kopfzeile.columnconfigure(
+            1,
+            weight=1
+        )
+
+        self.semester_bereich = tk.Frame(
+            self.modul_kopfzeile
+        )
+        self.semester_bereich.grid(
+            row=0,
+            column=0,
+            sticky="w",
+            padx=(0, 20)
+        )
+
+        semester_werte = []
+
+        for semester in self.controller.semester_abrufen():
+            semester_werte.append(f"Semester {semester.nummer}")
+
+        self.semester_auswahl = ttk.Combobox(
+            self.semester_bereich,
+            values=semester_werte,
+            state="readonly",
+            width=14
+        )
+        self.semester_auswahl.pack(
+            anchor="w"
+        )
+
+        if semester_werte:
+            self.semester_auswahl.current(0)
+
+        self.verwaltungs_aktionen = tk.Frame(
+            self.modul_kopfzeile
+        )
+        self.verwaltungs_aktionen.grid(
+            row=0,
+            column=1,
+            sticky="e"
+        )
+
+        self.semester_hinzufuegen_button = tk.Button(
+            self.verwaltungs_aktionen,
+            text="+ Semester hinzufügen",
+            command=self.semester_hinzufuegen
+        )
+        self.semester_hinzufuegen_button.pack(
+            side="left",
+            padx=(0, 10)
+        )
+
+        self.semester_entfernen_button = tk.Button(
+            self.verwaltungs_aktionen,
+            text="- Semester entfernen",
+            state="disabled"
+        )
+        self.semester_entfernen_button.pack(
+            side="left",
+            padx=(0, 10)
+        )
+
+        self.modul_hinzufuegen_button = tk.Button(
+            self.verwaltungs_aktionen,
+            text="+ Modul hinzufügen",
+            state="normal"
+        )
+        self.modul_hinzufuegen_button.pack(
+            side="left",
+            padx=(0, 10)
+        )
+
+        self.modul_entfernen_button = tk.Button(
+            self.verwaltungs_aktionen,
+            text="- Modul entfernen",
+            state="normal"
+        )
+        self.modul_entfernen_button.pack(
+            side="left"
+        )
+
+        self.tabellen_bereich = tk.Frame(
+            self.modul_bereich
+        )
+        self.tabellen_bereich.pack(
+            fill="both",
+            expand=True,
+            padx=20,
+            pady=(0, 20)
+        )
+
+        self.modul_tabelle = ttk.Treeview(
+            self.tabellen_bereich,
+            columns=("modul", "ects", "status", "note"),
+            show="headings",
+            selectmode="browse",
+            height=6
+        )
+
+        self.modul_tabelle.heading(
+            "modul",
+            text="Modul",
+            anchor="w"
+        )
+        self.modul_tabelle.column(
+            "modul",
+            width=550,
+            anchor="w"
+        )
+
+        self.modul_tabelle.heading(
+            "ects",
+            text="ECTS"
+        )
+        self.modul_tabelle.column(
+            "ects",
+            width=80,
+            anchor="center",
+            stretch=False
+        )
+
+        self.modul_tabelle.heading(
+            "status",
+            text="Status"
+        )
+        self.modul_tabelle.column(
+            "status",
+            width=160,
+            anchor="center",
+            stretch=False
+        )
+
+        self.modul_tabelle.heading(
+            "note",
+            text="Note"
+        )
+        self.modul_tabelle.column(
+            "note",
+            width=80,
+            anchor="center",
+            stretch=False
+        )
+
+        self.modul_tabelle.pack(
+            side="left",
+            fill="both",
+            expand=True
+        )
+
+        self.modul_scrollbar = ttk.Scrollbar(
+            self.tabellen_bereich,
+            orient="vertical",
+            command=self.modul_tabelle.yview
+        )
+        self.modul_scrollbar.pack(
+            side="right",
+            fill="y"
+        )
+
+        self.modul_tabelle.config(
+            yscrollcommand=self.modul_scrollbar.set
+        )
+
+        self.semester_auswahl.bind(
+            "<<ComboboxSelected>>",
+            self.modultabelle_aktualisieren
+        )
+
+        self.modultabelle_aktualisieren()
+
+    def modultabelle_aktualisieren(self, ereignis=None) -> None:
+        for zeile in self.modul_tabelle.get_children():
+            self.modul_tabelle.delete(zeile)
+
+        ausgewaehltes_semester = None
+
+        for semester in self.controller.semester_abrufen():
+            if self.semester_auswahl.get() == f"Semester {semester.nummer}":
+                ausgewaehltes_semester = semester
+                break
+
+        if ausgewaehltes_semester is None:
+            return
+
+        module = self.controller.module_abrufen(
+            ausgewaehltes_semester.nummer
+        )
+
+        for modul in module:
+            note = ""
+
+            if modul.pruefungsleistung is not None:
+                if modul.pruefungsleistung.note is not None:
+                    note = f"{modul.pruefungsleistung.note:.1f}"
+
+            self.modul_tabelle.insert(
+                "",
+                "end",
+                values=(
+                    modul.name,
+                    modul.ects,
+                    modul.status.value,
+                    note
+                )
+            )
+
+    def semester_hinzufuegen(self) -> None:
+        neue_nummer = 1
+
+        for semester in self.controller.semester_abrufen():
+            if semester.nummer >= neue_nummer:
+                neue_nummer = semester.nummer + 1
+
+        self.controller.semester_hinzufuegen(neue_nummer)
+
+        semester_werte = []
+
+        for semester in self.controller.semester_abrufen():
+            semester_werte.append(f"Semester {semester.nummer}")
+
+        self.semester_auswahl.config(
+            values=semester_werte
+        )
+        self.semester_auswahl.set(
+            f"Semester {neue_nummer}"
+        )
+
+        self.modultabelle_aktualisieren()
 
     def starten(self) -> None:
         self.fenster.mainloop()
