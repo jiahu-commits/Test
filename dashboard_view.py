@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+from modul_status import ModulStatus
+from pruefungsart import Pruefungsart
 
 from dashboard_controller import DashboardController
 
@@ -434,7 +436,8 @@ class DashboardView:
         self.modul_hinzufuegen_button = tk.Button(
             self.verwaltungs_aktionen,
             text="+ Modul hinzufügen",
-            state="normal"
+            state="normal",
+            command=self.modul_hinzufuegen
         )
         self.modul_hinzufuegen_button.pack(
             side="left",
@@ -659,6 +662,109 @@ class DashboardView:
             self.semester_auswahl.set("")
 
         self.modultabelle_aktualisieren()
+
+    def modul_hinzufuegen(self) -> None:
+        ausgewaehltes_semester = self.ausgewaehltes_semester_finden()
+
+        if ausgewaehltes_semester is None:
+            messagebox.showinfo(
+                "Kein Semester ausgewählt",
+                "Bitte zuerst ein Semester auswählen.",
+                parent=self.fenster
+            )
+            return
+
+        modul_fenster = tk.Toplevel(self.fenster)
+        modul_fenster.title("Modul hinzufügen")
+
+        tk.Label(
+            modul_fenster,
+            text="Modulname:"
+        ).grid(
+            row=0,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="w"
+        )
+
+        modulname_eingabe = tk.Entry(modul_fenster)
+
+        modulname_eingabe.grid(
+            row=0,
+            column=1,
+            padx=10,
+            pady=10
+        )
+
+        tk.Label(
+            modul_fenster,
+            text="ECTS:"
+        ).grid(
+            row=1,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="w"
+        )
+
+        ects_eingabe = tk.Entry(modul_fenster)
+
+        ects_eingabe.grid(
+            row=1,
+            column=1,
+            padx=10,
+            pady=10
+        )
+
+        tk.Label(
+            modul_fenster,
+            text="Status:"
+        ).grid(
+            row=2,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="w"
+        )
+
+        status_auswahl = ttk.Combobox(
+            modul_fenster,
+            values=[status.value for status in ModulStatus],
+            state="readonly"
+        )
+
+        status_auswahl.grid(
+            row=2,
+            column=1,
+            padx=10,
+            pady=10
+        )
+
+        tk.Label(
+            modul_fenster,
+            text="Prüfungsart:"
+        ).grid(
+            row=3,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="w"
+        )
+
+        pruefungsart_auswahl = ttk.Combobox(
+            modul_fenster,
+            values=[art.value for art in Pruefungsart],
+            state="readonly"
+        )
+
+        pruefungsart_auswahl.grid(
+            row=3,
+            column=1,
+            padx=10,
+            pady=10
+        )
+
 
     def starten(self) -> None:
         self.fenster.mainloop()
