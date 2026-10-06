@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 from dashboard_controller import DashboardController
 
@@ -412,7 +412,7 @@ class DashboardView:
         self.semester_entfernen_button = tk.Button(
             self.verwaltungs_aktionen,
             text="- Semester entfernen",
-            state="disabled"
+            command=self.semester_entfernen
         )
         self.semester_entfernen_button.pack(
             side="left",
@@ -583,6 +583,68 @@ class DashboardView:
         self.semester_auswahl.set(
             f"Semester {neue_nummer}"
         )
+
+        self.modultabelle_aktualisieren()
+
+    def semester_entfernen(self) -> None:
+        ausgewaehltes_semester = None
+
+        for semester in self.controller.semester_abrufen():
+            if self.semester_auswahl.get() == f"Semester {semester.nummer}":
+                ausgewaehltes_semester = semester
+                break
+
+        if ausgewaehltes_semester is None:
+            messagebox.showinfo(
+                "Kein Semester ausgewählt",
+                "Bitte zuerst ein Semester auswählen.",
+                parent=self.fenster
+            )
+            return
+
+        hoechste_nummer = max(
+            semester.nummer
+            for semester in self.controller.semester_abrufen()
+        )
+
+        if ausgewaehltes_semester.nummer != hoechste_nummer:
+            messagebox.showinfo(
+                "Semester kann nicht entfernt werden",
+                "Es kann nur das letzte Semester entfernt werden.",
+                parent=self.fenster
+            )
+            return
+
+        module = self.controller.module_abrufen(
+            ausgewaehltes_semester.nummer
+        )
+
+        if module:
+            messagebox.showinfo(
+                "Semester nicht leer",
+                "Dieses Semester enthält noch Module und kann "
+                "deshalb nicht entfernt werden.",
+                parent=self.fenster
+            )
+            return
+
+        self.controller.semester_entfernen(
+            ausgewaehltes_semester.nummer
+        )
+
+        semester_werte = []
+
+        for semester in self.controller.semester_abrufen():
+            semester_werte.append(f"Semester {semester.nummer}")
+
+        self.semester_auswahl.config(
+            values=semester_werte
+        )
+
+        if semester_werte:
+            self.semester_auswahl.current(len(semester_werte) - 1)
+        else:
+            self.semester_auswahl.set("")
 
         self.modultabelle_aktualisieren()
 

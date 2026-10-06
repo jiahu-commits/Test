@@ -10,6 +10,13 @@ class DashboardApplication:
         self.service = StudienfortschrittService()
         self.repository = JsonRepository()
 
+        try:
+            aktueller_studiengang = self.repository.laden(
+                "studiendaten.json"
+            )
+        except FileNotFoundError:
+            pass
+
         self.controller = DashboardController(
             aktueller_studiengang,
             self.service,
