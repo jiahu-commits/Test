@@ -336,6 +336,21 @@ class DashboardView:
             pady=(0, 15)
         )
 
+    def ausgewaehltes_semester_finden(self):
+        for semester in self.controller.semester_abrufen():
+            if self.semester_auswahl.get() == f"Semester {semester.nummer}":
+                return semester
+
+        return None
+
+    def semester_werte_erstellen(self) -> list[str]:
+        semester_werte = []
+
+        for semester in self.controller.semester_abrufen():
+            semester_werte.append(f"Semester {semester.nummer}")
+
+        return semester_werte
+
     def modulbereich_erstellen(self) -> None:
         self.modul_bereich = tk.Frame(
             self.inhalt,
@@ -372,10 +387,7 @@ class DashboardView:
             padx=(0, 20)
         )
 
-        semester_werte = []
-
-        for semester in self.controller.semester_abrufen():
-            semester_werte.append(f"Semester {semester.nummer}")
+        semester_werte = self.semester_werte_erstellen()
 
         self.semester_auswahl = ttk.Combobox(
             self.semester_bereich,
@@ -543,12 +555,7 @@ class DashboardView:
         for zeile in self.modul_tabelle.get_children():
             self.modul_tabelle.delete(zeile)
 
-        ausgewaehltes_semester = None
-
-        for semester in self.controller.semester_abrufen():
-            if self.semester_auswahl.get() == f"Semester {semester.nummer}":
-                ausgewaehltes_semester = semester
-                break
+        ausgewaehltes_semester = self.ausgewaehltes_semester_finden()
 
         if ausgewaehltes_semester is None:
             return
@@ -562,7 +569,7 @@ class DashboardView:
             note = ""
 
             if modul.pruefungsleistung is not None:
-                pruefungsart = modul.pruefungsleistung
+                pruefungsart = modul.pruefungsleistung.pruefungsart.value
 
                 if modul.pruefungsleistung.note is not None:
                     note = f"{modul.pruefungsleistung.note:.1f}"
@@ -588,10 +595,7 @@ class DashboardView:
 
         self.controller.semester_hinzufuegen(neue_nummer)
 
-        semester_werte = []
-
-        for semester in self.controller.semester_abrufen():
-            semester_werte.append(f"Semester {semester.nummer}")
+        semester_werte = self.semester_werte_erstellen()
 
         self.semester_auswahl.config(
             values=semester_werte
@@ -603,12 +607,7 @@ class DashboardView:
         self.modultabelle_aktualisieren()
 
     def semester_entfernen(self) -> None:
-        ausgewaehltes_semester = None
-
-        for semester in self.controller.semester_abrufen():
-            if self.semester_auswahl.get() == f"Semester {semester.nummer}":
-                ausgewaehltes_semester = semester
-                break
+        ausgewaehltes_semester = self.ausgewaehltes_semester_finden()
 
         if ausgewaehltes_semester is None:
             messagebox.showinfo(
@@ -648,10 +647,7 @@ class DashboardView:
             ausgewaehltes_semester.nummer
         )
 
-        semester_werte = []
-
-        for semester in self.controller.semester_abrufen():
-            semester_werte.append(f"Semester {semester.nummer}")
+        semester_werte = self.semester_werte_erstellen()
 
         self.semester_auswahl.config(
             values=semester_werte
