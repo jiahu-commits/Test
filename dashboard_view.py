@@ -450,7 +450,7 @@ class DashboardView:
 
         self.modul_tabelle = ttk.Treeview(
             self.tabellen_bereich,
-            columns=("modul", "ects", "status", "note"),
+            columns=("modul","pruefungsart", "ects", "status", "note"),
             show="headings",
             selectmode="browse",
             height=6
@@ -465,6 +465,18 @@ class DashboardView:
             "modul",
             width=550,
             anchor="w"
+        )
+
+        self.modul_tabelle.heading(
+            "pruefungsart",
+            text="Prüfungsart",
+        )
+
+        self.modul_tabelle.column(
+            "pruefungsart",
+            width=180,
+            anchor="center",
+            stretch=False
         )
 
         self.modul_tabelle.heading(
@@ -546,9 +558,12 @@ class DashboardView:
         )
 
         for modul in module:
+            pruefungsart =  ""
             note = ""
 
             if modul.pruefungsleistung is not None:
+                pruefungsart = modul.pruefungsleistung
+
                 if modul.pruefungsleistung.note is not None:
                     note = f"{modul.pruefungsleistung.note:.1f}"
 
@@ -557,6 +572,7 @@ class DashboardView:
                 "end",
                 values=(
                     modul.name,
+                    pruefungsart,
                     modul.ects,
                     modul.status.value,
                     note
