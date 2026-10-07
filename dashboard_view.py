@@ -708,9 +708,13 @@ class DashboardView:
             sticky="w"
         )
 
-        ects_eingabe = tk.Entry(modul_fenster)
+        ects_auswahl = ttk.Combobox(
+            modul_fenster,
+            values=[5, 10],
+            state="readonly"
+        )
 
-        ects_eingabe.grid(
+        ects_auswahl.grid(
             row=1,
             column=1,
             padx=10,
@@ -765,6 +769,61 @@ class DashboardView:
             pady=10
         )
 
+        tk.Label(
+            modul_fenster,
+            text="Note:"
+        ).grid(
+            row=4,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="w"
+        )
+
+        note_eingabe = tk.Entry(modul_fenster)
+
+        note_eingabe.grid(
+            row=4,
+            column=1,
+            padx=10,
+            pady=10
+        )
+
+        speichern_button = tk.Button(
+            modul_fenster,
+            text="Speichern"
+        )
+
+        speichern_button.grid(
+            row=5,
+            column=0,
+            columnspan=2,
+            padx=10,
+            pady=15
+        )
+
+        def modul_speichern() -> None:
+            modulname = modulname_eingabe.get()
+            ects = ects_auswahl.get()
+            status = status_auswahl.get()
+            pruefungsart = pruefungsart_auswahl.get()
+            note = note_eingabe.get()
+
+            self.controller.modul_hinzufuegen(
+                ausgewaehltes_semester.nummer,
+                modulname,
+                ects,
+                status,
+                pruefungsart,
+                note
+            )
+
+            modul_fenster.destroy()
+            self.modultabelle_aktualisieren()
+
+        speichern_button.config(
+            command=modul_speichern
+        )
 
     def starten(self) -> None:
         self.fenster.mainloop()

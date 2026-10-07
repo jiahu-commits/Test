@@ -3,6 +3,7 @@ from semester import Semester
 from modul import Modul
 from modul_status import ModulStatus
 from pruefungsleistung import Pruefungsleistung
+from pruefungsart import Pruefungsart
 from studienfortschritt_service import StudienfortschrittService
 from json_repository import JsonRepository
 
@@ -55,14 +56,14 @@ class DashboardController:
         self.aktueller_studiengang.semester_entfernen(gefundenes_semester)
         self.repository.speichern(self.aktueller_studiengang, self.dateipfad)
 
-
     def modul_hinzufuegen(
             self,
             semester_nummer: int,
             name: str,
-            ects: int,
-            status: ModulStatus,
-            pruefungsleistung: Pruefungsleistung | None = None
+            ects: str,
+            status: str,
+            pruefungsart: str,
+            note: str
     ) -> None:
 
         gefundenes_semester = self._finde_semester(semester_nummer)
@@ -70,9 +71,33 @@ class DashboardController:
         if gefundenes_semester is None:
             return
 
-        neues_modul = Modul(name, ects, status, pruefungsleistung)
+        ects_wert = int(ects)
+        neuer_status = ModulStatus(status)
+
+        if note:
+            neue_note = float(note)
+        else:
+            neue_note = None
+
+        if pruefungsart:
+            neue_pruefungsart = Pruefungsart(pruefungsart)
+
+            neue_pruefungsleistung = Pruefungsleistung(
+                neue_pruefungsart,
+                neue_note
+            )
+        else:
+            neue_pruefungsleistung = None
+
+        neues_modul = Modul(
+            name,
+            ects_wert,
+            neuer_status,
+            neue_pruefungsleistung
+        )
+
         gefundenes_semester.modul_hinzufuegen(neues_modul)
-        self.repository.speichern(self.aktueller_studiengang, self.dateipfad)
+        self.repository.speichern(self.aktueller_studiengang,self.dateipfad)
 
     def modul_loeschen(self, semester_nummer: int, modul_name: str) -> None:
         gefundenes_semester = self._finde_semester(semester_nummer)
