@@ -21,6 +21,8 @@ class DashboardView:
         self.zeitbereich_erstellen()
         self.modulbereich_erstellen()
 
+        self.dashboard_aktualisieren()
+
 
     def kopfbereich_erstellen(self) -> None:
         self.kopfbereich = tk.Frame(
@@ -82,7 +84,6 @@ class DashboardView:
 
 
     def studienfortschritt_erstellen(self) -> None:
-        kennzahlen = self.controller.kennzahlen_abrufen()
 
         self.fortschritt_bereich = tk.Frame(
             self.kennzahlen_zeile,
@@ -110,9 +111,10 @@ class DashboardView:
 
         self.fortschritt_text = tk.Label(
             self.fortschritt_bereich,
-            text=f'{kennzahlen["erreichte_ects"]} von {kennzahlen["gesamt_ects"]} ECTS',
+            text="",
             font=("Arial", 16, "bold")
         )
+
         self.fortschritt_text.pack(
             anchor="w",
             padx=20,
@@ -122,6 +124,7 @@ class DashboardView:
         self.fortschritt_werte = tk.Frame(
             self.fortschritt_bereich
         )
+
         self.fortschritt_werte.pack(
             fill="x",
             padx=20
@@ -135,15 +138,17 @@ class DashboardView:
 
         self.fortschritt_prozent = tk.Label(
             self.fortschritt_werte,
-            text=f'{kennzahlen["ects_fortschritt"]:.1f} % erreicht'
+            text=""
         )
+
         self.fortschritt_prozent.pack(side="right")
 
         self.fortschritt_balken = ttk.Progressbar(
             self.fortschritt_bereich,
             maximum=100,
-            value=kennzahlen["ects_fortschritt"]
+            value=0
         )
+
         self.fortschritt_balken.pack(
             fill="x",
             padx=20,
@@ -151,7 +156,182 @@ class DashboardView:
         )
 
     def notenbereich_erstellen(self) -> None:
+        self.noten_bereich = tk.Frame(
+            self.kennzahlen_zeile,
+            bd=1,
+            relief="solid",
+            height=100
+        )
+
+        self.noten_bereich.grid(
+            row=0,
+            column=1,
+            sticky="nsew",
+            padx=(10, 0)
+        )
+
+        self.noten_titel = tk.Label(
+            self.noten_bereich,
+            text="Notendurchschnitt",
+            font=("Arial", 12, "bold")
+        )
+
+        self.noten_titel.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 5)
+        )
+
+        self.noten_text = tk.Label(
+            self.noten_bereich,
+            text="",
+            font=("Arial", 16, "bold")
+        )
+
+        self.noten_text.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 10)
+        )
+
+        self.noten_ziel = tk.Label(
+            self.noten_bereich,
+            text=""
+        )
+
+        self.noten_ziel.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 8)
+        )
+
+        self.noten_abweichung = tk.Label(
+            self.noten_bereich,
+            text=""
+        )
+
+        self.noten_abweichung.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 15)
+        )
+
+    def zeitbereich_erstellen(self) -> None:
+        self.zeit_bereich = tk.Frame(
+            self.inhalt,
+            bd=1,
+            relief="solid",
+            height=100
+        )
+
+        self.zeit_bereich.pack(
+            fill="x",
+            pady=(20, 0)
+        )
+
+        self.zeit_bereich.columnconfigure(
+            0,
+            weight=1,
+            uniform="zeit"
+        )
+
+        self.zeit_bereich.columnconfigure(
+            1,
+            weight=1,
+            uniform="zeit"
+        )
+
+        self.zeit_links = tk.Frame(
+            self.zeit_bereich
+        )
+
+        self.zeit_links.grid(
+            row=0,
+            column=0,
+            sticky="nsew"
+        )
+
+        self.zeit_titel = tk.Label(
+            self.zeit_links,
+            text="Zeitlicher Stand",
+            font=("Arial", 12, "bold")
+        )
+
+        self.zeit_titel.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 10)
+        )
+
+        self.zeit_text = tk.Label(
+            self.zeit_links,
+            text="",
+            font=("Arial", 14)
+        )
+
+        self.zeit_text.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 5)
+        )
+
+        self.zeit_prozent = tk.Label(
+            self.zeit_links,
+            text=""
+        )
+
+        self.zeit_prozent.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 15)
+        )
+
+        self.zeit_rechts = tk.Frame(
+            self.zeit_bereich
+        )
+
+        self.zeit_rechts.grid(
+            row=0,
+            column=1,
+            sticky="nsew"
+        )
+
+        self.zeit_soll = tk.Label(
+            self.zeit_rechts,
+            text=""
+        )
+
+        self.zeit_soll.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 10)
+        )
+
+        self.zeit_abweichung = tk.Label(
+            self.zeit_rechts,
+            text=""
+        )
+
+        self.zeit_abweichung.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 15)
+        )
+
+    def dashboard_aktualisieren(self) -> None:
         kennzahlen = self.controller.kennzahlen_abrufen()
+
+        self.fortschritt_text.config(
+            text=f'{kennzahlen["erreichte_ects"]} von {kennzahlen["gesamt_ects"]} ECTS'
+        )
+
+        self.fortschritt_prozent.config(
+            text=f'{kennzahlen["ects_fortschritt"]:.1f} % erreicht'
+        )
+
+        self.fortschritt_balken.config(
+            value=kennzahlen["ects_fortschritt"]
+        )
 
         notendurchschnitt = kennzahlen["notendurchschnitt"]
         zielnote = kennzahlen["zielnote"]
@@ -177,166 +357,44 @@ class DashboardView:
         else:
             abweichung_text = "Zielnote genau erreicht"
 
-        self.noten_bereich = tk.Frame(
-            self.kennzahlen_zeile,
-            bd=1,
-            relief="solid",
-            height=100
-        )
-        self.noten_bereich.grid(
-            row=0,
-            column=1,
-            sticky="nsew",
-            padx=(10, 0)
+        self.noten_text.config(
+            text=aktuell_text
         )
 
-        self.noten_titel = tk.Label(
-            self.noten_bereich,
-            text="Notendurchschnitt",
-            font=("Arial", 12, "bold")
-        )
-        self.noten_titel.pack(
-            anchor="w",
-            padx=20,
-            pady=(15, 5)
-        )
-
-        self.noten_text = tk.Label(
-            self.noten_bereich,
-            text=aktuell_text,
-            font=("Arial", 16, "bold")
-        )
-        self.noten_text.pack(
-            anchor="w",
-            padx=20,
-            pady=(0, 10)
-        )
-
-        self.noten_ziel = tk.Label(
-            self.noten_bereich,
+        self.noten_ziel.config(
             text=ziel_text
         )
-        self.noten_ziel.pack(
-            anchor="w",
-            padx=20,
-            pady=(0, 8)
-        )
 
-        self.noten_abweichung = tk.Label(
-            self.noten_bereich,
+        self.noten_abweichung.config(
             text=abweichung_text
         )
-        self.noten_abweichung.pack(
-            anchor="w",
-            padx=20,
-            pady=(0, 15)
-        )
 
-
-    def zeitbereich_erstellen(self) -> None:
-        kennzahlen = self.controller.kennzahlen_abrufen()
-
-        self.zeit_bereich = tk.Frame(
-            self.inhalt,
-            bd=1,
-            relief="solid",
-            height=100
-        )
-        self.zeit_bereich.pack(
-            fill="x",
-            pady=(20, 0)
-        )
-
-        self.zeit_bereich.columnconfigure(
-            0,
-            weight=1,
-            uniform="zeit"
-        )
-        self.zeit_bereich.columnconfigure(
-            1,
-            weight=1,
-            uniform="zeit"
-        )
-
-        self.zeit_links = tk.Frame(
-            self.zeit_bereich
-        )
-        self.zeit_links.grid(
-            row=0,
-            column=0,
-            sticky="nsew"
-        )
-
-        self.zeit_titel = tk.Label(
-            self.zeit_links,
-            text="Zeitlicher Stand",
-            font=("Arial", 12, "bold")
-        )
-        self.zeit_titel.pack(
-            anchor="w",
-            padx=20,
-            pady=(15, 10)
-        )
-
-        self.zeit_text = tk.Label(
-            self.zeit_links,
+        self.zeit_text.config(
             text=(
                 f'{kennzahlen["vergangene_monate"]} von '
                 f'{kennzahlen["studiendauer_monate"]} '
                 f'Studienmonaten vergangen'
-            ),
-            font=("Arial", 14)
-        )
-        self.zeit_text.pack(
-            anchor="w",
-            padx=20,
-            pady=(0, 5)
+            )
         )
 
-        self.zeit_prozent = tk.Label(
-            self.zeit_links,
+        self.zeit_prozent.config(
             text=(
                 f'{kennzahlen["zeitfortschritt"]:.1f} % '
                 f'der geplanten Studienzeit'
             )
         )
-        self.zeit_prozent.pack(
-            anchor="w",
-            padx=20,
-            pady=(0, 15)
-        )
 
-        self.zeit_rechts = tk.Frame(
-            self.zeit_bereich
-        )
-        self.zeit_rechts.grid(
-            row=0,
-            column=1,
-            sticky="nsew"
-        )
-
-        self.zeit_soll = tk.Label(
-            self.zeit_rechts,
+        self.zeit_soll.config(
             text=f'Soll-Stand: {kennzahlen["soll_ects"]:.2f} ECTS'
         )
-        self.zeit_soll.pack(
-            anchor="w",
-            padx=20,
-            pady=(15, 10)
-        )
 
-        self.zeit_abweichung = tk.Label(
-            self.zeit_rechts,
+        self.zeit_abweichung.config(
             text=(
                 f'Abweichung '
                 f'{kennzahlen["ects_soll_ist_abweichung"]:+.2f} ECTS'
             )
         )
-        self.zeit_abweichung.pack(
-            anchor="w",
-            padx=20,
-            pady=(0, 15)
-        )
+
 
     def ausgewaehltes_semester_finden(self):
         for semester in self.controller.semester_abrufen():
@@ -546,6 +604,7 @@ class DashboardView:
         self.modul_tabelle.config(
             yscrollcommand=self.modul_scrollbar.set
         )
+
 
         self.semester_auswahl.bind(
             "<<ComboboxSelected>>",
@@ -789,19 +848,6 @@ class DashboardView:
             pady=10
         )
 
-        speichern_button = tk.Button(
-            modul_fenster,
-            text="Speichern"
-        )
-
-        speichern_button.grid(
-            row=5,
-            column=0,
-            columnspan=2,
-            padx=10,
-            pady=15
-        )
-
         def modul_speichern() -> None:
             modulname = modulname_eingabe.get()
             ects = ects_auswahl.get()
@@ -818,12 +864,24 @@ class DashboardView:
                 note
             )
 
-            modul_fenster.destroy()
             self.modultabelle_aktualisieren()
+            self.dashboard_aktualisieren()
+            modul_fenster.destroy()
 
-        speichern_button.config(
+        speichern_button = tk.Button(
+            modul_fenster,
+            text="Speichern",
             command=modul_speichern
         )
+
+        speichern_button.grid(
+            row=5,
+            column=0,
+            columnspan=2,
+            padx=10,
+            pady=15
+        )
+
 
     def starten(self) -> None:
         self.fenster.mainloop()
