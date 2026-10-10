@@ -860,14 +860,19 @@ class DashboardView:
             pruefungsart = pruefungsart_auswahl.get()
             note = note_eingabe.get()
 
-            self.controller.modul_hinzufuegen(
-                ausgewaehltes_semester.nummer,
-                modulname,
-                ects,
-                status,
-                pruefungsart,
-                note
-            )
+            try:
+                self.controller.modul_hinzufuegen(
+                    ausgewaehltes_semester.nummer,
+                    modulname,
+                    ects,
+                    status,
+                    pruefungsart,
+                    note
+                )
+
+            except ValueError as fehler:
+                    messagebox.showerror("Ungültige Eingabe",str(fehler))
+                    return
 
             self.modultabelle_aktualisieren()
             self.dashboard_aktualisieren()
@@ -970,12 +975,18 @@ class DashboardView:
             neuer_status = status_auswahl.get()
             neue_note = note_eingabe.get()
 
-            self.controller.modul_bearbeiten(
-                ausgewaehltes_semester.nummer,
-                modulname,
-                neuer_status,
-                neue_note
-                )
+            try:
+                self.controller.modul_bearbeiten(
+                    ausgewaehltes_semester.nummer,
+                    modulname,
+                    neuer_status,
+                    neue_note
+                    )
+
+
+            except ValueError as fehler:
+                    messagebox.showerror("Ungültige Eingabe",str(fehler))
+                    return
 
             self.modultabelle_aktualisieren()
             self.dashboard_aktualisieren()

@@ -71,11 +71,22 @@ class DashboardController:
         if gefundenes_semester is None:
             return
 
+        bereits_vorhandenes_modul = self._finde_modul(
+            semester_nummer,
+            name
+        )
+
+        if bereits_vorhandenes_modul is not None:
+            raise ValueError ("Dieses Modul existiert in diesem Semester bereits.")
+
         ects_wert = int(ects)
         neuer_status = ModulStatus(status)
 
         if note:
-            neue_note = float(note)
+            try:
+                neue_note = float(note)
+            except ValueError:
+                raise ValueError("Bitte gib eine gültige Note ein.")
         else:
             neue_note = None
 
@@ -121,25 +132,32 @@ class DashboardController:
             neue_note: str
     ) -> None:
 
-        gefundenes_modul = self._finde_modul(semester_nummer,modul_name)
+        gefundenes_modul = self._finde_modul(
+            semester_nummer,
+            modul_name
+        )
 
         if gefundenes_modul is None:
             return
 
         status_wert = ModulStatus(neuer_status)
 
+        if neue_note:
+            try:
+                note_wert = float(neue_note)
+            except ValueError:
+                raise ValueError(
+                    "Bitte gib eine gültige Note ein."
+                )
+        else:
+            note_wert = None
+
         gefundenes_modul.status = status_wert
 
         if gefundenes_modul.pruefungsleistung is not None:
 
             if status_wert == ModulStatus.BESTANDEN:
-                if neue_note:
-                    note_wert = float(neue_note)
-                else:
-                    note_wert = None
-
                 gefundenes_modul.pruefungsleistung.note = note_wert
-
             else:
                 gefundenes_modul.pruefungsleistung.note = None
 
