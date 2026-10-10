@@ -10,7 +10,6 @@ from pruefungsart import Pruefungsart
 
 class JsonRepository:
     def speichern(self, aktueller_studiengang: Studiengang, dateipfad: str) -> None:
-        datei = open(dateipfad, "w", encoding="utf-8")
         daten = {
             "name": aktueller_studiengang.name,
             "startdatum": aktueller_studiengang.startdatum.isoformat(),
@@ -48,14 +47,18 @@ class JsonRepository:
 
             daten["semester"].append(semester_daten)
 
-        json.dump(daten, datei, ensure_ascii=False, indent=4)
-        datei.close()
+        with open(dateipfad, "w", encoding="utf-8") as datei:
+            json.dump(
+                daten,
+                datei,
+                ensure_ascii=False,
+                indent=4
+            )
 
 
     def laden(self, dateipfad: str) -> Studiengang:
-        datei = open(dateipfad, "r", encoding="utf-8")
-        daten = json.load(datei)
-        datei.close()
+        with open(dateipfad, "r", encoding="utf-8") as datei:
+            daten = json.load(datei)
         geladener_studiengang = Studiengang(
             daten["name"],
             date.fromisoformat(daten["startdatum"]),

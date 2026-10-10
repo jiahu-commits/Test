@@ -71,6 +71,9 @@ class DashboardController:
         if gefundenes_semester is None:
             return
 
+        if not name.strip():
+            raise ValueError("Bitte gib einen Modulnamen ein.")
+
         bereits_vorhandenes_modul = self._finde_modul(
             semester_nummer,
             name
@@ -79,16 +82,35 @@ class DashboardController:
         if bereits_vorhandenes_modul is not None:
             raise ValueError ("Dieses Modul existiert in diesem Semester bereits.")
 
+        if not ects:
+            raise ValueError("Bitte wähle die ECTS aus.")
+
         ects_wert = int(ects)
+
+        if not status:
+            raise ValueError("Bitte wähle einen Status aus.")
+
         neuer_status = ModulStatus(status)
 
         if note:
             try:
                 neue_note = float(note)
+
             except ValueError:
                 raise ValueError("Bitte gib eine gültige Note ein.")
+
+            if not 1.0 <= neue_note <= 5.0:
+                raise ValueError("Die Note muss zwischen 1.0 und 5.0 liegen.")
         else:
             neue_note = None
+
+        if neue_note is not None and neuer_status != ModulStatus.BESTANDEN:
+            raise ValueError(
+                "Eine Note kann nur bei einem bestandenen Modul eingetragen werden."
+            )
+
+        if neue_note is not None and not pruefungsart:
+            raise ValueError("Für eine Note muss eine Prüfungsart ausgewählt werden.")
 
         if pruefungsart:
             neue_pruefungsart = Pruefungsart(pruefungsart)
@@ -128,6 +150,7 @@ class DashboardController:
             self,
             semester_nummer: int,
             modul_name: str,
+            neue_pruefungsart: str,
             neuer_status: str,
             neue_note: str
     ) -> None:
@@ -146,13 +169,31 @@ class DashboardController:
             try:
                 note_wert = float(neue_note)
             except ValueError:
-                raise ValueError(
-                    "Bitte gib eine gültige Note ein."
-                )
+                raise ValueError("Bitte gib eine gültige Note ein.")
+
+            if not 1.0 <= note_wert <= 5.0:
+                raise ValueError("Die Note muss zwischen 1.0 und 5.0 liegen.")
         else:
             note_wert = None
 
+        if note_wert is not None and status_wert != ModulStatus.BESTANDEN:
+            raise ValueError("Eine Note kann nur bei einem bestandenen Modul eingetragen werden.")
+
+        if note_wert is not None and not neue_pruefungsart:
+            raise ValueError("Für eine Note muss eine Prüfungsart ausgewählt werden.")
+
+        if neue_pruefungsart:
+            pruefungsart_wert = Pruefungsart(neue_pruefungsart)
+
+            neue_pruefungsleistung = Pruefungsleistung(
+                pruefungsart_wert,
+                note_wert
+            )
+        else:
+            neue_pruefungsleistung = None
+
         gefundenes_modul.status = status_wert
+        gefundenes_modul.pruefungsleistung = neue_pruefungsleistung
 
         if gefundenes_modul.pruefungsleistung is not None:
 

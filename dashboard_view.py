@@ -906,6 +906,7 @@ class DashboardView:
         )
 
         modulname = zeilen_werte[0]
+        pruefungsart = zeilen_werte[1]
         status = zeilen_werte[3]
         note = zeilen_werte[4]
 
@@ -919,9 +920,37 @@ class DashboardView:
 
         tk.Label(
             bearbeiten_fenster,
-            text="Status:"
+            text="Prüfungsart:"
         ).grid(
             row=0,
+            column=0,
+            padx=10,
+            pady=10
+        )
+
+        pruefungsart_auswahl = ttk.Combobox(
+            bearbeiten_fenster,
+            values=[
+                pruefungsart_option.value
+                for pruefungsart_option in Pruefungsart
+            ],
+            state="readonly"
+        )
+
+        pruefungsart_auswahl.grid(
+            row=0,
+            column=1,
+            padx=10,
+            pady=10
+        )
+
+        pruefungsart_auswahl.set(pruefungsart)
+
+        tk.Label(
+            bearbeiten_fenster,
+            text="Status:"
+        ).grid(
+            row=1,
             column=0,
             padx=10,
             pady=10
@@ -937,7 +966,7 @@ class DashboardView:
         )
 
         status_auswahl.grid(
-            row=0,
+            row=1,
             column=1,
             padx=10,
             pady=10
@@ -949,7 +978,7 @@ class DashboardView:
             bearbeiten_fenster,
             text="Note:"
         ).grid(
-            row=1,
+            row=2,
             column=0,
             padx=10,
             pady=10
@@ -960,7 +989,7 @@ class DashboardView:
         )
 
         note_eingabe.grid(
-            row=1,
+            row=2,
             column=1,
             padx=10,
             pady=10
@@ -972,6 +1001,7 @@ class DashboardView:
         )
 
         def aenderungen_speichern() -> None:
+            neue_pruefungsart = pruefungsart_auswahl.get()
             neuer_status = status_auswahl.get()
             neue_note = note_eingabe.get()
 
@@ -979,6 +1009,7 @@ class DashboardView:
                 self.controller.modul_bearbeiten(
                     ausgewaehltes_semester.nummer,
                     modulname,
+                    neue_pruefungsart,
                     neuer_status,
                     neue_note
                     )
@@ -999,7 +1030,7 @@ class DashboardView:
         )
 
         speichern_button.grid(
-            row=2,
+            row=3,
             column=0,
             columnspan=2,
             padx=10,
