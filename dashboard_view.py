@@ -741,6 +741,9 @@ class DashboardView:
         modul_fenster = tk.Toplevel(self.fenster)
         modul_fenster.title("Modul hinzufügen")
 
+        modul_fenster.transient(self.fenster)
+        modul_fenster.grab_set()
+
         tk.Label(
             modul_fenster,
             text="Modulname:"
@@ -917,6 +920,9 @@ class DashboardView:
 
         bearbeiten_fenster = tk.Toplevel(self.fenster)
         bearbeiten_fenster.title("Modul bearbeiten")
+
+        bearbeiten_fenster.transient(self.fenster)
+        bearbeiten_fenster.grab_set()
 
         tk.Label(
             bearbeiten_fenster,
