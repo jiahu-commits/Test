@@ -99,7 +99,7 @@ class DashboardController:
         gefundenes_semester.modul_hinzufuegen(neues_modul)
         self.repository.speichern(self.aktueller_studiengang,self.dateipfad)
 
-    def modul_loeschen(self, semester_nummer: int, modul_name: str) -> None:
+    def modul_entfernen(self, semester_nummer: int, modul_name: str) -> None:
         gefundenes_semester = self._finde_semester(semester_nummer)
 
         if gefundenes_semester is None:
@@ -113,24 +113,37 @@ class DashboardController:
         gefundenes_semester.modul_entfernen(gefundenes_modul)
         self.repository.speichern(self.aktueller_studiengang, self.dateipfad)
 
-    def status_aendern(self, semester_nummer: int, modul_name: str, neuer_status: ModulStatus) -> None:
-        gefundenes_modul = self._finde_modul(semester_nummer, modul_name)
+    def modul_bearbeiten(
+            self,
+            semester_nummer: int,
+            modul_name: str,
+            neuer_status: str,
+            neue_note: str
+    ) -> None:
+
+        gefundenes_modul = self._finde_modul(semester_nummer,modul_name)
 
         if gefundenes_modul is None:
             return
 
-        gefundenes_modul.status = neuer_status
-        self.repository.speichern(self.aktueller_studiengang, self.dateipfad)
+        status_wert = ModulStatus(neuer_status)
 
-    def note_eintragen(self, semester_nummer: int, modul_name: str, neue_note: float) -> None:
-        gefundenes_modul = self._finde_modul(semester_nummer, modul_name)
-        if gefundenes_modul is None:
-            return
-        if gefundenes_modul.pruefungsleistung is None:
-            return
+        gefundenes_modul.status = status_wert
 
-        gefundenes_modul.pruefungsleistung.note = neue_note
-        self.repository.speichern(self.aktueller_studiengang, self.dateipfad)
+        if gefundenes_modul.pruefungsleistung is not None:
+
+            if status_wert == ModulStatus.BESTANDEN:
+                if neue_note:
+                    note_wert = float(neue_note)
+                else:
+                    note_wert = None
+
+                gefundenes_modul.pruefungsleistung.note = note_wert
+
+            else:
+                gefundenes_modul.pruefungsleistung.note = None
+
+        self.repository.speichern(self.aktueller_studiengang,self.dateipfad)
 
     def semester_abrufen(self) -> list[Semester]:
         return self.aktueller_studiengang.semester

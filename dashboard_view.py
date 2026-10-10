@@ -344,7 +344,7 @@ class DashboardView:
 
         ziel_text = f"Ziel: {zielnote:.1f} oder besser"
 
-        if notendurchschnitt is None or notenabweichung is None:
+        if notendurchschnitt is None:
             abweichung_text = "Noch kein Notenvergleich möglich"
         elif notendurchschnitt < zielnote:
             abweichung_text = (
@@ -505,10 +505,11 @@ class DashboardView:
         self.modul_entfernen_button = tk.Button(
             self.verwaltungs_aktionen,
             text="- Modul entfernen",
-            state="normal"
+            state="normal",
+            command=self.ausgewaehltes_modul_entfernen
         )
         self.modul_entfernen_button.pack(
-            side="left"
+            side="left",
         )
 
         self.tabellen_bereich = tk.Frame(
@@ -605,6 +606,10 @@ class DashboardView:
             yscrollcommand=self.modul_scrollbar.set
         )
 
+        self.modul_tabelle.bind(
+            "<Double-1>",
+            self.modul_bearbeiten
+        )
 
         self.semester_auswahl.bind(
             "<<ComboboxSelected>>",
@@ -882,6 +887,149 @@ class DashboardView:
             pady=15
         )
 
+    def modul_bearbeiten(self, ereignis=None) -> None:
+        ausgewaehlte_zeile = self.modul_tabelle.selection()
+
+        if not ausgewaehlte_zeile:
+            return
+
+        zeilen_id = ausgewaehlte_zeile[0]
+
+        zeilen_werte = self.modul_tabelle.item(
+            zeilen_id,
+            "values"
+        )
+
+        modulname = zeilen_werte[0]
+        status = zeilen_werte[3]
+        note = zeilen_werte[4]
+
+        ausgewaehltes_semester = self.ausgewaehltes_semester_finden()
+
+        if ausgewaehltes_semester is None:
+            return
+
+        bearbeiten_fenster = tk.Toplevel(self.fenster)
+        bearbeiten_fenster.title("Modul bearbeiten")
+
+        tk.Label(
+            bearbeiten_fenster,
+            text="Status:"
+        ).grid(
+            row=0,
+            column=0,
+            padx=10,
+            pady=10
+        )
+
+        status_auswahl = ttk.Combobox(
+            bearbeiten_fenster,
+            values=[
+                status_option.value
+                for status_option in ModulStatus
+            ],
+            state="readonly"
+        )
+
+        status_auswahl.grid(
+            row=0,
+            column=1,
+            padx=10,
+            pady=10
+        )
+
+        status_auswahl.set(status)
+
+        tk.Label(
+            bearbeiten_fenster,
+            text="Note:"
+        ).grid(
+            row=1,
+            column=0,
+            padx=10,
+            pady=10
+        )
+
+        note_eingabe = tk.Entry(
+            bearbeiten_fenster
+        )
+
+        note_eingabe.grid(
+            row=1,
+            column=1,
+            padx=10,
+            pady=10
+        )
+
+        note_eingabe.insert(
+            0,
+            note
+        )
+
+        def aenderungen_speichern() -> None:
+            neuer_status = status_auswahl.get()
+            neue_note = note_eingabe.get()
+
+            self.controller.modul_bearbeiten(
+                ausgewaehltes_semester.nummer,
+                modulname,
+                neuer_status,
+                neue_note
+                )
+
+            self.modultabelle_aktualisieren()
+            self.dashboard_aktualisieren()
+            bearbeiten_fenster.destroy()
+
+        speichern_button = tk.Button(
+            bearbeiten_fenster,
+            text="Speichern",
+            command=aenderungen_speichern
+        )
+
+        speichern_button.grid(
+            row=2,
+            column=0,
+            columnspan=2,
+            padx=10,
+            pady=15
+        )
+
+    def ausgewaehltes_modul_entfernen(self) -> None:
+        ausgewaehlte_zeile = self.modul_tabelle.selection()
+
+        if not ausgewaehlte_zeile:
+            return
+
+        zeilen_id = ausgewaehlte_zeile[0]
+
+        zeilen_werte = self.modul_tabelle.item(
+            zeilen_id,
+            "values"
+        )
+
+        modulname = zeilen_werte[0]
+
+        ausgewaehltes_semester = self.ausgewaehltes_semester_finden()
+
+        if ausgewaehltes_semester is None:
+            return
+
+        bestaetigung = messagebox.askyesno(
+            "Modul löschen",
+            f'Möchtest du das Modul "{modulname}" wirklich löschen?'
+        )
+
+        if not bestaetigung:
+            return
+
+        self.controller.modul_entfernen(
+            ausgewaehltes_semester.nummer,
+            modulname
+        )
+
+        self.modultabelle_aktualisieren()
+        self.dashboard_aktualisieren()
 
     def starten(self) -> None:
         self.fenster.mainloop()
