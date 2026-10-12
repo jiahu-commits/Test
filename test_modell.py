@@ -1,4 +1,6 @@
 from datetime import date
+
+from json_repository import JsonRepository
 from studiengang import Studiengang
 from semester import Semester
 from modul import Modul
@@ -6,6 +8,7 @@ from pruefungsleistung import Pruefungsleistung
 from pruefungsart import Pruefungsart
 from modul_status import ModulStatus
 from studienfortschritt_service import StudienfortschrittService
+from dashboard_controller import DashboardController
 from dashboard_application import DashboardApplication
 
 pruefung = Pruefungsleistung(Pruefungsart.KLAUSUR, 1.3)
@@ -16,12 +19,7 @@ studiengang = Studiengang("Medizinische Informatik", date(2026, 7, 30), 180, 48,
 studiengang.semester_hinzufuegen(semester)
 
 service = StudienfortschrittService()
+repository = JsonRepository()
 
-print(service.berechne_erreichte_ects(studiengang))
-print(service.berechne_notendurchschnitt(studiengang))
-print(service.berechne_zeitfortschritt(studiengang))
-print(service.berechne_ects_fortschritt(studiengang))
-print(service.berechne_vergangene_monate(studiengang))
+controller = DashboardController(studiengang, service, repository)
 
-print(studiengang.semester[0].module[0].pruefungsleistung.note)
-print(studiengang.semester[0].module[0].pruefungsleistung.pruefungsart.value)

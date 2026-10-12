@@ -35,7 +35,7 @@ class JsonRepository:
                 aktuelle_pruefungsleistung = aktuelles_modul.pruefungsleistung
 
                 if aktuelle_pruefungsleistung is not None:
-                    modul_daten["pruefungsleistung"] = {
+                       modul_daten["pruefungsleistung"] = {
                         "pruefungsart": aktuelle_pruefungsleistung.pruefungsart.value,
                         "note": aktuelle_pruefungsleistung.note
                     }
