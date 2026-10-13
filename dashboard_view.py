@@ -684,35 +684,17 @@ class DashboardView:
             )
             return
 
-        hoechste_nummer = max(
-            semester.nummer
-            for semester in self.controller.semester_abrufen()
-        )
-
-        if ausgewaehltes_semester.nummer != hoechste_nummer:
+        try:
+            self.controller.semester_entfernen(
+                ausgewaehltes_semester.nummer
+            )
+        except ValueError as fehler:
             messagebox.showinfo(
                 "Semester kann nicht entfernt werden",
-                "Es kann nur das letzte Semester entfernt werden.",
+                str(fehler),
                 parent=self.fenster
             )
             return
-
-        module = self.controller.module_abrufen(
-            ausgewaehltes_semester.nummer
-        )
-
-        if module:
-            messagebox.showinfo(
-                "Semester nicht leer",
-                "Dieses Semester enthält noch Module und kann "
-                "deshalb nicht entfernt werden.",
-                parent=self.fenster
-            )
-            return
-
-        self.controller.semester_entfernen(
-            ausgewaehltes_semester.nummer
-        )
 
         semester_werte = self.semester_werte_erstellen()
 

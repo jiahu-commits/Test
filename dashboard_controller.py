@@ -48,13 +48,26 @@ class DashboardController:
         gefundenes_semester = self._finde_semester(semester_nummer)
 
         if gefundenes_semester is None:
-            return
+            raise ValueError("Dieses Semester existiert nicht.")
+
+        hoechste_nummer = max(
+            semester.nummer
+            for semester in self.semester_abrufen()
+        )
+
+        if gefundenes_semester.nummer != hoechste_nummer:
+            raise ValueError(
+                "Es kann nur das letzte Semester entfernt werden."
+            )
 
         if gefundenes_semester.module:
-            return
+            raise ValueError(
+                "Dieses Semester enthält noch Module und kann "
+                "deshalb nicht entfernt werden."
+            )
 
         self.aktueller_studiengang.semester_entfernen(gefundenes_semester)
-        self.repository.speichern(self.aktueller_studiengang, self.dateipfad)
+        self.repository.speichern(self.aktueller_studiengang,self.dateipfad)
 
     def modul_hinzufuegen(
             self,
@@ -96,8 +109,6 @@ class DashboardController:
             except ValueError:
                 raise ValueError("Bitte gib eine gültige Note ein.")
 
-            if not 1.0 <= neue_note <= 5.0:
-                raise ValueError("Die Note muss zwischen 1.0 und 5.0 liegen.")
         else:
             neue_note = None
 
@@ -163,8 +174,6 @@ class DashboardController:
             except ValueError:
                 raise ValueError("Bitte gib eine gültige Note ein.")
 
-            if not 1.0 <= note_wert <= 5.0:
-                raise ValueError("Die Note muss zwischen 1.0 und 5.0 liegen.")
         else:
             note_wert = None
 

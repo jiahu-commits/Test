@@ -22,15 +22,20 @@ class Pruefungsleistung:
 
         self._pruefungsart = neue_pruefungsart
 
-
     @property
     def note(self) -> float | None:
         return self._note
 
     @note.setter
     def note(self, neue_note: float | None) -> None:
-        if neue_note is not None and not isinstance(neue_note, (int, float)):
-            raise ValueError("Ungültige Note")
+        if neue_note is not None:
+            if not isinstance(neue_note, (int, float)):
+                raise ValueError("Die Note muss eine Zahl sein.")
+
+            if not 1.0 <= neue_note <= 5.0:
+                raise ValueError(
+                    "Die Note muss zwischen 1.0 und 5.0 liegen."
+                )
 
         self._note = neue_note
 
